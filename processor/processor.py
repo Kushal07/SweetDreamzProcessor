@@ -192,3 +192,27 @@ class SweetDreamzProcessor:
 
 
         return result
+    
+    def process_workbook(
+        self,
+        source_sheet: str,
+        destination_sheet: str,
+        rows: list[int],
+    ) -> None:
+        """
+        Process multiple workbook rows.
+
+        This method is the high-level orchestration entry point.
+        """
+
+        self.statistics.start()
+
+        try:
+            for row in rows:
+                self.process_and_write_row(
+                    source_sheet=source_sheet,
+                    destination_sheet=destination_sheet,
+                    row=row,
+                )
+        finally:
+            self.statistics.finish()
