@@ -15,7 +15,7 @@ from openpyxl.workbook.workbook import Workbook
 
 from utils.logger import get_logger
 from processor.validator import WorkbookValidator
-
+from openpyxl.worksheet.worksheet import Worksheet
 
 class WorkbookManager:
     """Handles workbook loading."""
@@ -69,6 +69,14 @@ class WorkbookManager:
             raise RuntimeError("Workbook not loaded.")
 
         return self.workbook.active
+    
+    def get_sheet(self, sheet_name: str) -> Worksheet:
+        """Return a worksheet by name."""
+
+        if self.workbook is None:
+            raise RuntimeError("Workbook not loaded.")
+
+        return self.workbook[sheet_name]
 
     def information(self) -> dict:
         """Return workbook information."""
@@ -85,3 +93,26 @@ class WorkbookManager:
             "rows": ws.max_row,
             "columns": ws.max_column,
         }
+    def get_row_data(
+        self,
+        sheet_name: str,
+        row_number: int,
+        date_col: int = 1,
+        first_prize_col: int = 2,
+        second_prize_col: int = 3,
+    ) -> dict:
+        """
+        Read one row from a worksheet.
+
+        Returns
+        -------
+        dict
+        """
+
+        ws = self.get_sheet(sheet_name)
+
+        return {
+            "date": ws.cell(row=row_number, column=date_col).value,
+            "first_prize": ws.cell(row=row_number, column=first_prize_col).value,
+            "second_prize": ws.cell(row=row_number, column=second_prize_col).value,
+        } 
