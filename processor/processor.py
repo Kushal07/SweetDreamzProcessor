@@ -15,6 +15,7 @@ from processor.block_detector import (
 )
 
 from utils.logger import get_logger
+from processor.processing_statistics import ProcessingStatistics
 
 class SweetDreamzProcessor:
 
@@ -28,7 +29,7 @@ class SweetDreamzProcessor:
         self.writer = WorkbookWriter()
 
         self.block_detector = BlockDetector()
-
+        self.statistics = ProcessingStatistics()
         self.logger = get_logger(__name__)
         self.sheet_mappings: dict[str, dict[str, dict[str, int]]] = {}
 
@@ -38,15 +39,6 @@ class SweetDreamzProcessor:
 
         self._build_sheet_mappings()
 
-        self.sheet_mappings.clear()
-
-        for sheet_name in self.workbook.sheet_names():
-
-            worksheet = self.workbook.get_sheet(sheet_name)
-
-            self.sheet_mappings[sheet_name] = (
-                self.mapper.map_pair_columns(worksheet)
-            )
 
     def _build_sheet_mappings(self) -> None:
         """
@@ -63,8 +55,7 @@ class SweetDreamzProcessor:
                 self.mapper.map_pair_columns(worksheet)
             )
 
-            print(sheet_name)
-            print(sorted(self.sheet_mappings[sheet_name].keys())[:20])
+
 
     def process_row(
         self,
@@ -126,6 +117,7 @@ class SweetDreamzProcessor:
 
         # COMPLETE → Skip
         if state is BlockState.COMPLETE:
+            self.statistics.complete_blocks_skipped += 1
             self.workbook.logger.info(
                 f"Row {row}, Pair {pair}: skipped (already complete)."
             )
@@ -133,6 +125,7 @@ class SweetDreamzProcessor:
 
         # PARTIAL → Rewrite and log warning
         if state is BlockState.PARTIAL:
+            self.statistics.partial_blocks_rewritten += 1
             self.workbook.logger.warning(
                 f"Row {row}, Pair {pair}: partially filled block detected. Rewriting block."
             )
@@ -146,6 +139,7 @@ class SweetDreamzProcessor:
         )
 
         if state is BlockState.EMPTY:
+            self.statistics.empty_blocks_written += 1
             self.workbook.logger.info(
                 f"Row {row}, Pair {pair}: empty block filled."
             )
@@ -181,16 +175,20 @@ class SweetDreamzProcessor:
 
         Returns the processed result.
         """
+        self.statistics.total_rows_scanned += 1
 
         result = self.process_row(
+            
             source_sheet,
             row,
         )
+        self.statistics.rows_processed += 1
 
         self.write_middle_arrangement(
             worksheet_name=destination_sheet,
             row=row,
             arrangement=result["middle"],
         )
+
 
         return result
