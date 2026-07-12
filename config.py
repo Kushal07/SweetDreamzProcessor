@@ -1,57 +1,51 @@
 """
-SweetDreamzProcessor Configuration
-----------------------------------
-Global configuration used throughout the application.
+=========================================================
+SweetDreamz Processor
+Configuration Module
+
+Author : Kushal Bera
+Version : 1.0.0
+Python : 3.11+
+
+Stores every configurable setting used by the application.
+=========================================================
 """
 
 from pathlib import Path
 
 
-# -----------------------------
-# Application Information
-# -----------------------------
-APP_NAME = "SweetDreamzProcessor"
-APP_VERSION = "1.0.0"
+class Config:
+    """Application configuration."""
 
-# -----------------------------
-# Folder Structure
-# -----------------------------
-ROOT_DIR = Path(__file__).resolve().parent
+    APP_NAME = "SweetDreamz Processor"
+    VERSION = "1.0.0"
 
-INPUT_DIR = ROOT_DIR / "input"
-OUTPUT_DIR = ROOT_DIR / "output"
-LOG_DIR = ROOT_DIR / "logs"
-ASSET_DIR = ROOT_DIR / "assets"
+    ROOT = Path(__file__).resolve().parent
 
-# Create folders automatically
-INPUT_DIR.mkdir(exist_ok=True)
-OUTPUT_DIR.mkdir(exist_ok=True)
-LOG_DIR.mkdir(exist_ok=True)
-ASSET_DIR.mkdir(exist_ok=True)
+    INPUT_FOLDER = ROOT / "input"
+    OUTPUT_FOLDER = ROOT / "output"
+    LOG_FOLDER = ROOT / "logs"
+    ASSET_FOLDER = ROOT / "assets"
 
-# -----------------------------
-# Workbook Sheet Names
-# -----------------------------
-NUMBER_WISE_SHEET = "Number wise arrangement"
-LAST_DIGIT_SHEET = "Last digit arrangement"
+    OUTPUT_FILE = "SweetDreamz_Processed.xlsx"
 
-# -----------------------------
-# Prize Columns
-# -----------------------------
-FIRST_PRIZE_COLUMN = "B"
-SECOND_PRIZE_COLUMN = "C"
+    VALID_NUMBER_LENGTH = 5
 
-# -----------------------------
-# Logging
-# -----------------------------
-LOG_FILE = LOG_DIR / "SweetDreamzProcessor.log"
+    LOG_FILE = LOG_FOLDER / "SweetDreamz.log"
 
-# -----------------------------
-# Output
-# -----------------------------
-OUTPUT_FILENAME = "SweetDreamz_Processed.xlsx"
+    WINDOW_WIDTH = 950
+    WINDOW_HEIGHT = 650
 
-# -----------------------------
-# Validation
-# -----------------------------
-VALID_NUMBER_LENGTH = 5
+    TITLE = f"{APP_NAME} v{VERSION}"
+
+    @classmethod
+    def create_folders(cls) -> None:
+        """Create required folders."""
+
+        cls.INPUT_FOLDER.mkdir(exist_ok=True)
+        cls.OUTPUT_FOLDER.mkdir(exist_ok=True)
+        cls.LOG_FOLDER.mkdir(exist_ok=True)
+        cls.ASSET_FOLDER.mkdir(exist_ok=True)
+
+
+Config.create_folders()
