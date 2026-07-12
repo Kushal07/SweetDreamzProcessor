@@ -104,6 +104,8 @@ Implemented block states:
 - Improved processing workflow
 - Removed duplicate mapping build
 - Removed debug output
+- GUI now interacts with SweetDreamzProcessor instead of directly owning a WorkbookManager.
+- WorkbookManager is now exclusively owned by SweetDreamzProcessor.
 
 ### Testing
 

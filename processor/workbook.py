@@ -94,7 +94,7 @@ class WorkbookManager:
             "columns": ws.max_column,
         }
     
-    def suggested_output_filename(self) -> Path:
+    def suggested_output_filename(self) -> str:
         """
         Return the suggested filename for the processed workbook.
 
@@ -110,8 +110,9 @@ class WorkbookManager:
         if self.file_path is None:
             raise RuntimeError("Workbook path not available.")
 
-        return self.file_path.with_name(
-            f"{self.file_path.stem}_Modified_KB{self.file_path.suffix}"
+        return (
+            f"{self.file_path.stem}_Modified_KB"
+            f"{self.file_path.suffix}"
         )
 
     def get_row_data(

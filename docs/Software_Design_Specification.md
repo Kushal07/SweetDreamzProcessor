@@ -136,9 +136,9 @@ GUI
  ▼
 SweetDreamzProcessor
  │
+ ├── WorkbookManager
  ├── WorkbookVerifier
  ├── BackupManager
- ├── WorkbookManager
  ├── WorkbookMapper
  ├── WorkbookWriter
  ├── NumberExtractor
