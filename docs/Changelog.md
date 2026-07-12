@@ -96,6 +96,7 @@ Implemented block states:
 - Added fail-fast workbook readiness verification before row processing.
 - Integrated BackupManager into the processing workflow.
 - Automatic timestamped workbook backups are now created before processing begins.
+- Add the new filename generation feature.
 
 ### Architecture
 

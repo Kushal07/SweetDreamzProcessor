@@ -26,7 +26,7 @@ The application:
 - Generates processing statistics.
 - Creates automatic workbook backups.
 - Saves the processed workbook.
-
+- Document the default processed filename format.
 ---
 
 # 2. Technology Stack

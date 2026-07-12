@@ -120,6 +120,7 @@ Responsibilities
 - Save workbook.
 - Access worksheets.
 - Read row data.
+- Responsible for generating the suggested output filename.
 
 Not Responsible For
 

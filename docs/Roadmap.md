@@ -84,6 +84,7 @@
 - [x] WorkbookVerifier implemented
 - [x] WorkbookVerifier integrated into process_workbook()
 - [x] Backup Integration
+- [x] Output naming policy has been implemented (if you decide to track it separately).
 
 ## Remaining
 

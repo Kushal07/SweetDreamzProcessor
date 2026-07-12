@@ -93,6 +93,27 @@ class WorkbookManager:
             "rows": ws.max_row,
             "columns": ws.max_column,
         }
+    
+    def suggested_output_filename(self) -> Path:
+        """
+        Return the suggested filename for the processed workbook.
+
+        Example
+        -------
+        Lottery.xlsx
+
+        becomes
+
+        Lottery_Modified_KB.xlsx
+        """
+
+        if self.file_path is None:
+            raise RuntimeError("Workbook path not available.")
+
+        return self.file_path.with_name(
+            f"{self.file_path.stem}_Modified_KB{self.file_path.suffix}"
+        )
+
     def get_row_data(
         self,
         sheet_name: str,
