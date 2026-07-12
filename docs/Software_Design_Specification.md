@@ -136,6 +136,8 @@ GUI
  ▼
 SweetDreamzProcessor
  │
+ ├── WorkbookVerifier
+ ├── BackupManager
  ├── WorkbookManager
  ├── WorkbookMapper
  ├── WorkbookWriter
@@ -143,8 +145,7 @@ SweetDreamzProcessor
  ├── NumberArranger
  ├── RowDetector
  ├── BlockDetector
- ├── ProcessingStatistics
- └── BackupManager
+ └── ProcessingStatistics
 ```
 
 ---

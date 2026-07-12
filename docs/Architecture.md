@@ -235,16 +235,15 @@ GUI
  ▼
 SweetDreamzProcessor
  │
- ├── WorkbookManager
- ├── WorkbookValidator
  ├── WorkbookVerifier
+ ├── BackupManager
+ ├── WorkbookManager
  ├── WorkbookMapper
  ├── WorkbookWriter
  ├── NumberExtractor
  ├── NumberArranger
  ├── RowDetector
  ├── BlockDetector
- ├── BackupManager
  └── ProcessingStatistics
 ```
 

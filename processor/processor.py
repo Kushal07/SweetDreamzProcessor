@@ -8,6 +8,7 @@ from processor.extractor import NumberExtractor
 from processor.arranger import NumberArranger
 from processor.workbook_mapper import WorkbookMapper
 from processor.workbook_verifier import WorkbookVerifier
+from processor.backup_manager import BackupManager
 from processor.writer import WorkbookWriter
 
 from processor.row_detector import RowDetector
@@ -29,6 +30,8 @@ class SweetDreamzProcessor:
         self.arranger = NumberArranger()
         self.mapper = WorkbookMapper()
         self.writer = WorkbookWriter()
+
+        self.backup_manager = BackupManager()
 
         self.block_detector = BlockDetector()
         self.statistics = ProcessingStatistics()
@@ -209,6 +212,18 @@ class SweetDreamzProcessor:
             sheet_mappings=self.sheet_mappings,
             source_sheet=source_sheet,
             destination_sheet=destination_sheet,
+        )
+
+        if self.workbook.file_path is None:
+            raise RuntimeError("Workbook path is not available.")
+
+        backup_path = self.backup_manager.create_backup(
+            self.workbook.file_path
+        )
+
+        self.logger.info(
+            "Workbook backup created: %s",
+            backup_path,
         )
 
         worksheet = self.workbook.get_sheet(source_sheet)
