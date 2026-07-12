@@ -116,3 +116,22 @@ class WorkbookManager:
             "first_prize": ws.cell(row=row_number, column=first_prize_col).value,
             "second_prize": ws.cell(row=row_number, column=second_prize_col).value,
         } 
+    
+    def save(self, filename: str | Path) -> None:
+        """
+        Save the currently loaded workbook.
+        """
+
+        if self.workbook is None:
+            raise RuntimeError("Workbook not loaded.")
+
+        filename = Path(filename)
+
+        filename.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        self.workbook.save(filename)
+
+        self.logger.info(f"Workbook saved: {filename}")

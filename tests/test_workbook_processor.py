@@ -1,17 +1,34 @@
 from processor.processor import SweetDreamzProcessor
 
 
-def test_workbook_processing():
+def test_process_and_write_row():
     processor = SweetDreamzProcessor()
 
     processor.load_workbook("Sweet Dreamz.xlsx")
 
-    result = processor.process_row(
-        "Number wise arrangement",
-        2,
+    result = processor.process_and_write_row(
+        source_sheet="Number wise arrangement",
+        destination_sheet="Number wise arrangement",
+        row=2,
     )
 
     assert result["date"] is not None
     assert len(result["numbers"]) > 0
     assert len(result["middle"]) > 0
-    assert len(result["last"]) > 0
+
+    worksheet = processor.workbook.get_sheet("Number wise arrangement")
+
+    # At least one mapped block should now contain written data.
+    wrote_data = False
+
+    mapping = processor.sheet_mappings["Number wise arrangement"]
+
+    for pair, data in result["middle"].items():
+
+        column = mapping[pair]["series"]
+
+        if worksheet.cell(row=2, column=column).value == data["series"]:
+            wrote_data = True
+            break
+
+    assert wrote_data
