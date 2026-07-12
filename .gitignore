@@ -15,8 +15,6 @@ output/
 dist/
 build/
 
-# Test files
-test_*.py
 
 # PyInstaller
 *.spec
