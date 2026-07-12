@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from utils.logger import get_logger
 from datetime import datetime
 from pathlib import Path
 import shutil
@@ -13,6 +14,10 @@ class BackupManager:
     def __init__(self, backup_directory: str = "backup") -> None:
         self.backup_directory = Path(backup_directory)
         self.backup_directory.mkdir(parents=True, exist_ok=True)
+
+        self.logger = get_logger(__name__)
+
+        self.last_backup_path: Path | None = None
 
     def create_backup(self, workbook_path: str) -> Path:
         """
@@ -32,5 +37,11 @@ class BackupManager:
         )
 
         shutil.copy2(source, destination)
+
+        self.last_backup_path = destination
+
+        self.logger.info(
+            f"Backup created: {destination.name}"
+        )
 
         return destination

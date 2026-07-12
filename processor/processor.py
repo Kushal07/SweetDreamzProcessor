@@ -7,8 +7,10 @@ from processor.workbook import WorkbookManager
 from processor.extractor import NumberExtractor
 from processor.arranger import NumberArranger
 from processor.workbook_mapper import WorkbookMapper
+from processor.workbook_verifier import WorkbookVerifier
 from processor.writer import WorkbookWriter
 
+from processor.row_detector import RowDetector
 from processor.block_detector import (
     BlockDetector,
     BlockState,
@@ -197,22 +199,44 @@ class SweetDreamzProcessor:
         self,
         source_sheet: str,
         destination_sheet: str,
-        rows: list[int],
-    ) -> None:
+    ) -> ProcessingStatistics:
         """
-        Process multiple workbook rows.
+        Process all eligible rows in a workbook.
+        """
 
-        This method is the high-level orchestration entry point.
-        """
+        WorkbookVerifier.verify(
+            workbook_manager=self.workbook,
+            sheet_mappings=self.sheet_mappings,
+            source_sheet=source_sheet,
+            destination_sheet=destination_sheet,
+        )
+
+        worksheet = self.workbook.get_sheet(source_sheet)
 
         self.statistics.start()
 
         try:
-            for row in rows:
+            for row_number in range(2, worksheet.max_row + 1):
+
+                row = self.workbook.get_row_data(
+                    source_sheet,
+                    row_number,
+                )
+
+                if not RowDetector.should_process(
+                    row["date"],
+                    row["first_prize"],
+                    row["second_prize"],
+                ):
+                    continue
+
                 self.process_and_write_row(
                     source_sheet=source_sheet,
                     destination_sheet=destination_sheet,
-                    row=row,
+                    row=row_number,
                 )
+
         finally:
             self.statistics.finish()
+
+        return self.statistics

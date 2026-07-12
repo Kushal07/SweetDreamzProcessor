@@ -98,6 +98,9 @@ Validate Workbook
 Load Workbook
  │
  ▼
+Verify Workbook
+ │
+ ▼
 Create Backup
  │
  ▼
@@ -118,9 +121,6 @@ Process Each Row
  │
  ▼
 Save Workbook
- │
- ▼
-Verify Workbook
  │
  ▼
 Return Processing Statistics

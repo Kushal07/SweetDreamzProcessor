@@ -92,6 +92,8 @@ Implemented block states:
 - Added process_workbook()
 - Added automatic row discovery
 - Returned ProcessingStatistics from process_workbook()
+- Integrated WorkbookVerifier into the processing workflow.
+- Added fail-fast workbook readiness verification before row processing.
 
 ### Architecture
 
@@ -104,7 +106,7 @@ Implemented block states:
 
 - Added BackupManager tests
 - Added ProcessingStatistics tests
-- Current status: **Current regression suite: 19 tests (as of v0.3.0)**
+- Current status: **Current regression suite: 20 tests (as of v0.3.0)**
 
 ---
 
@@ -114,7 +116,6 @@ Planned features
 
 - Backup integration
 - Save processed workbook
-- Workbook verification
 - End-to-end processing workflow
 
 ---

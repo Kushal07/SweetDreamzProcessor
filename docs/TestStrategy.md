@@ -102,7 +102,7 @@ No feature is complete until the entire regression suite passes.
 
 Current Tests
 
-- 19 passing tests
+- 20 passing tests
 
 Status
 
@@ -125,7 +125,7 @@ python -m pytest
 Expected Output
 
 ```text
-19 passed
+20 passed
 ```
 
 ---

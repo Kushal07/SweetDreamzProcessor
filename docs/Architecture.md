@@ -58,10 +58,13 @@ Validate Workbook
 Build Worksheet Mapping
         │
         ▼
-Start Processing Statistics
+Verify Workbook
         │
         ▼
-Create Backup (Planned Integration)
+Create Backup
+        │
+        ▼
+Start Processing Statistics
         │
         ▼
 Detect Eligible Rows
@@ -77,10 +80,7 @@ For Each Row
         └── Write Results
         │
         ▼
-Save Workbook (Planned)
-        │
-        ▼
-Verify Workbook (Planned)
+Save Workbook
         │
         ▼
 Return Processing Statistics
@@ -218,6 +218,12 @@ Responsibilities
 
 - Create timestamped workbook backups.
 - Log backup creation.
+## WorkbookVerifier
+
+Responsibilities
+
+- Owns verification logic.
+
 
 ---
 
@@ -230,14 +236,16 @@ GUI
 SweetDreamzProcessor
  │
  ├── WorkbookManager
+ ├── WorkbookValidator
+ ├── WorkbookVerifier
  ├── WorkbookMapper
+ ├── WorkbookWriter
  ├── NumberExtractor
  ├── NumberArranger
  ├── RowDetector
  ├── BlockDetector
- ├── WorkbookWriter
- ├── ProcessingStatistics
- └── BackupManager
+ ├── BackupManager
+ └── ProcessingStatistics
 ```
 
 Dependencies should always flow downward.
@@ -264,7 +272,6 @@ The project follows:
 The following components are planned:
 
 ```text
-WorkbookVerifier
 
 GUI Progress Manager
 
