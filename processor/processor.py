@@ -56,11 +56,13 @@ class SweetDreamzProcessor:
 
             worksheet = self.workbook.get_sheet(sheet_name)
 
-            self.sheet_mappings[sheet_name] = (
-                self.mapper.map_pair_columns(worksheet)
-            )
+            if sheet_name.lower() == "last digit arrangement":
+                mapping = self.mapper.map_last_digit_columns(worksheet)
+            else:
+                mapping = self.mapper.map_pair_columns(worksheet)
 
-
+            self.sheet_mappings[sheet_name] = mapping
+            
 
     def process_row(
         self,
@@ -149,6 +151,69 @@ class SweetDreamzProcessor:
                 f"Row {row}, Pair {pair}: empty block filled."
             )
 
+    def write_last_pair(
+        self,
+        worksheet_name: str,
+        row: int,
+        pair: str,
+        data: dict,
+    ) -> None:
+        """
+        Write one middle-pair block using WorkbookMapper.
+        """
+
+        worksheet = self.workbook.get_sheet(worksheet_name)
+
+        mapping = self.sheet_mappings.get(worksheet_name)
+
+        if mapping is None:
+            raise RuntimeError(
+                f"No cached mapping for worksheet '{worksheet_name}'."
+            )
+
+        if pair not in mapping:
+            raise KeyError(
+                f"Pair '{pair}' not found in worksheet mapping."
+            )
+
+        columns = mapping[pair]
+
+        state = self.block_detector.detect(
+            worksheet=worksheet,
+            row=row,
+            start_column=columns["series"],
+        )
+
+        # COMPLETE → Skip
+        if state is BlockState.COMPLETE:
+            self.statistics.complete_blocks_skipped += 1
+            self.workbook.logger.info(
+                f"Row {row}, Pair {pair}: skipped (already complete)."
+            )
+            return
+
+        # PARTIAL → Rewrite and log warning
+        if state is BlockState.PARTIAL:
+            self.statistics.partial_blocks_rewritten += 1
+            self.workbook.logger.warning(
+                f"Row {row}, Pair {pair}: partially filled block detected. Rewriting block."
+            )
+
+        # EMPTY or PARTIAL → Write
+        self.writer.write_last_block(
+            worksheet=worksheet,
+            row=row,
+            start_column=columns["series"],
+            data=data,
+        )
+
+        if state is BlockState.EMPTY:
+            self.statistics.empty_blocks_written += 1
+            self.workbook.logger.info(
+                f"Row {row}, Pair {pair}: empty block filled."
+            )
+
+
     def write_middle_arrangement(
         self,
         worksheet_name: str,
@@ -168,10 +233,27 @@ class SweetDreamzProcessor:
                 data=data,
             )
 
+    def write_last_arrangement(
+        self,
+        worksheet_name: str,
+        row: int,
+        arrangement: dict[str, dict[str, str]],
+    ) -> None:
+
+        for pair, data in arrangement.items():
+
+            self.write_last_pair(
+                worksheet_name=worksheet_name,
+                row=row,
+                pair=pair,
+                data=data,
+            )
+
     def process_and_write_row(
         self,
         source_sheet: str,
-        destination_sheet: str,
+        number_wise_sheet: str,
+        last_digit_sheet: str,
         row: int,
     ) -> dict:
         """
@@ -188,20 +270,26 @@ class SweetDreamzProcessor:
             row,
         )
         self.statistics.rows_processed += 1
+        self.logger.info(f"Processed row {row}")
 
         self.write_middle_arrangement(
-            worksheet_name=destination_sheet,
+            worksheet_name=number_wise_sheet,
             row=row,
             arrangement=result["middle"],
         )
 
-
+        self.write_last_arrangement(
+            worksheet_name=last_digit_sheet,
+            row=row,
+            arrangement=result["last"],
+        )
         return result
     
     def process_workbook(
         self,
         source_sheet: str,
-        destination_sheet: str,
+        number_wise_sheet: str,
+        last_digit_sheet: str,
     ) -> ProcessingStatistics:
         """
         Process all eligible rows in a workbook.
@@ -211,7 +299,7 @@ class SweetDreamzProcessor:
             workbook_manager=self.workbook,
             sheet_mappings=self.sheet_mappings,
             source_sheet=source_sheet,
-            destination_sheet=destination_sheet,
+            destination_sheet=number_wise_sheet,
         )
 
         if self.workbook.file_path is None:
@@ -233,6 +321,8 @@ class SweetDreamzProcessor:
         try:
             for row_number in range(2, worksheet.max_row + 1):
 
+                self.logger.info(f"Checking row {row_number}")
+
                 row = self.workbook.get_row_data(
                     source_sheet,
                     row_number,
@@ -243,11 +333,13 @@ class SweetDreamzProcessor:
                     row["first_prize"],
                     row["second_prize"],
                 ):
+                    self.logger.info(f"Skipping row {row_number}")
                     continue
 
                 self.process_and_write_row(
                     source_sheet=source_sheet,
-                    destination_sheet=destination_sheet,
+                    number_wise_sheet=number_wise_sheet,
+                    last_digit_sheet=last_digit_sheet,
                     row=row_number,
                 )
 

@@ -5,19 +5,22 @@ GUI Module
 
 from pathlib import Path
 import tkinter as tk
-from tkinter import filedialog, ttk
+from tkinter import (
+    filedialog,
+    messagebox,
+    ttk,
+)
 
 from config import Config
 from utils.logger import get_logger
-from processor.workbook import WorkbookManager
-
+from processor.processor import SweetDreamzProcessor
 
 class SweetDreamzApp:
     """Main GUI application."""
 
     def __init__(self) -> None:
         self.logger = get_logger(__name__)
-        self.workbook = WorkbookManager()
+        self.processor = SweetDreamzProcessor()
 
         self.root = tk.Tk()
         self.root.title(Config.TITLE)
@@ -83,6 +86,7 @@ class SweetDreamzApp:
         self.process_btn = ttk.Button(
             button_frame,
             text="Process Workbook",
+            command=self.process_workbook,
             state="disabled"
         )
 
@@ -110,12 +114,11 @@ class SweetDreamzApp:
             return
 
         try:
-            self.workbook.load(filename)
+            self.processor.load_workbook(filename)
 
-            info = self.workbook.information()
+            info = self.processor.workbook.information()
 
             self.selected_file = Path(filename)
-
             self.file_label.config(
                 text=info["filename"]
             )
@@ -129,6 +132,71 @@ class SweetDreamzApp:
             self.log(
                 "Sheet Names : "
                 + ", ".join(info["sheet_names"])
+            )
+
+        except Exception as e:
+            self.log(f"ERROR: {e}")
+
+    def process_workbook(self) -> None:
+        """
+        Process the selected workbook.
+        """
+
+        if self.selected_file is None:
+            self.log("No workbook selected.")
+            return
+
+        try:
+            self.log("Processing workbook...")
+
+            statistics = self.processor.process_workbook(
+                source_sheet="Number wise arrangement",
+                number_wise_sheet="Number wise arrangement",
+                last_digit_sheet="Last digit arrangement",
+            )
+
+            summary = statistics.summary()
+
+            self.log("Processing completed.")
+            self.log("-" * 40)
+            self.log(f"Rows scanned        : {summary['total_rows_scanned']}")
+            self.log(f"Rows processed      : {summary['rows_processed']}")
+            self.log(f"Empty blocks written: {summary['empty_blocks_written']}")
+            self.log(f"Blocks skipped      : {summary['complete_blocks_skipped']}")
+            self.log(f"Blocks rewritten    : {summary['partial_blocks_rewritten']}")
+            self.log(f"Errors              : {summary['errors']}")
+            self.log(
+                f"Duration            : "
+                f"{summary['duration_seconds']:.2f} seconds"
+            )
+            self.log("-" * 40)
+
+            suggested_filename = (
+                self.processor.workbook.suggested_output_filename()
+            )
+
+            save_path = filedialog.asksaveasfilename(
+                title="Save Processed Workbook",
+                initialfile=suggested_filename,
+                defaultextension=".xlsx",
+                filetypes=[
+                    ("Excel Workbook", "*.xlsx"),
+                    ("Excel Macro Workbook", "*.xlsm"),
+                ],
+                
+            )
+
+            if not save_path:
+                self.log("Save cancelled by user.")
+                return
+
+            self.processor.workbook.save(save_path)
+
+            self.log(f"Workbook saved successfully:\n{save_path}")
+
+            messagebox.showinfo(
+                "Success",
+                "Workbook processed and saved successfully."
             )
 
         except Exception as e:

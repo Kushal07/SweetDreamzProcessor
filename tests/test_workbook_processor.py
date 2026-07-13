@@ -8,7 +8,8 @@ def test_process_and_write_row():
 
     result = processor.process_and_write_row(
         source_sheet="Number wise arrangement",
-        destination_sheet="Number wise arrangement",
+        number_wise_sheet="Number wise arrangement",
+        last_digit_sheet="Last digit arrangement",
         row=2,
     )
 

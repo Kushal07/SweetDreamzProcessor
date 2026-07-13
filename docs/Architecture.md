@@ -1,24 +1,127 @@
 # SweetDreamzProcessor
+
 # Software Architecture
 
-**Version:** 0.3.0
+Version: 0.4.0
+Status: Architecture Freeze
 
 ---
 
-# 1. Overview
+## Document Information
 
-SweetDreamzProcessor follows a modular architecture based on the **Single Responsibility Principle (SRP)**.
-
-Each class has one clearly defined responsibility.
-
-The central coordinator is `SweetDreamzProcessor`, which orchestrates the complete workbook processing workflow.
+| Item | Value |
+|------|-------|
+| Project | SweetDreamzProcessor |
+| Document | Software Architecture |
+| Version | 0.4.0 (Design Freeze) |
+| Status | Active Development |
+| Architecture | Layered Modular Architecture |
+| Language | Python 3.14 |
+| GUI | Tkinter |
+| Workbook Library | openpyxl |
 
 ---
 
-# 2. High-Level Architecture
+# 1. Purpose
+
+This document describes the technical architecture of SweetDreamzProcessor.
+
+It explains how the software is organised, how the different components interact, and how responsibilities are distributed across the system.
+
+Unlike the Software Design Specification, this document focuses on implementation architecture rather than business requirements.
+
+---
+
+# 2. Architectural Goals
+
+The architecture has been designed to achieve the following goals:
+
+- High maintainability
+- Clear separation of responsibilities
+- Workbook safety
+- Easy testing
+- Modular development
+- Reusable components
+- Minimal coupling
+- High cohesion
+
+The architecture follows a layered modular design where each component owns exactly one responsibility.
+---
+
+# 3. Layered Architecture
+
+SweetDreamzProcessor is organised into five logical layers.
 
 ```text
-                GUI
+Presentation Layer
+────────────────────────
+Tkinter GUI
+
+        │
+
+Application Layer
+────────────────────────
+SweetDreamzProcessor
+
+        │
+
+Business Layer
+────────────────────────
+NumberExtractor
+NumberArranger
+RowDetector
+BlockDetector
+
+        │
+
+Infrastructure Layer
+────────────────────────
+WorkbookManager
+WorkbookMapper
+WorkbookWriter
+WorkbookVerifier
+BackupManager
+
+        │
+
+Support Services
+────────────────────────
+ProcessingStatistics
+Configuration
+Logger
+
+        │
+
+Excel Workbook
+```
+
+Dependencies always flow downward.
+
+Lower layers never depend on upper layers.
+
+---
+
+# 4. Component Interaction
+
+The GUI communicates only with the application layer.
+
+The application layer coordinates the complete processing workflow.
+
+Business components never communicate directly with the GUI.
+
+Infrastructure components never contain business rules.
+
+Workbook writing is always performed through WorkbookWriter after the processor has determined the correct destination and block state.
+
+This separation keeps the architecture modular and maintainable.
+
+---
+
+# 5. High-Level Architecture
+                User
+                 │
+                 ▼
+            Tkinter GUI
                  │
                  ▼
       SweetDreamzProcessor
@@ -26,69 +129,133 @@ The central coordinator is `SweetDreamzProcessor`, which orchestrates the comple
  ┌───────────────┼────────────────┐
  │               │                │
  ▼               ▼                ▼
-Workbook     Processing      Utilities
-Management     Engine
+Business      Infrastructure    Services
+Components      Components
 
-WorkbookManager
-WorkbookMapper
-WorkbookWriter
-
-NumberExtractor
-NumberArranger
-RowDetector
-BlockDetector
-ProcessingStatistics
-BackupManager
-
-Logger
-Configuration
-```
+                 │
+                 ▼
+           Excel Workbook
 
 ---
 
-# 3. Processing Pipeline
+# 6. Component Processing Pipeline
+
+The following diagram illustrates how the application components collaborate during workbook processing.
 
 ```text
-Load Workbook
-        │
-        ▼
-Validate Workbook
-        │
-        ▼
-Build Worksheet Mapping
-        │
-        ▼
-Verify Workbook
-        │
-        ▼
-Create Backup
-        │
-        ▼
-Start Processing Statistics
-        │
-        ▼
-Detect Eligible Rows
-        │
-        ▼
-For Each Row
-        │
-        ├── Read Row Data
-        ├── Extract Numbers
-        ├── Arrange Middle Pair
-        ├── Arrange Last Pair
-        ├── Detect Block State
-        └── Write Results
-        │
-        ▼
-Save Workbook
-        │
-        ▼
-Return Processing Statistics
+GUI
+ │
+ ▼
+SweetDreamzProcessor
+ │
+ ├── WorkbookManager
+ │       │
+ │       ├── Load Workbook
+ │       └── Access Worksheets
+ │
+ ├── WorkbookValidator
+ │
+ ├── WorkbookMapper
+ │
+ ├── WorkbookVerifier
+ │
+ ├── BackupManager
+ │
+ ├── RowDetector
+ │
+ ├── NumberExtractor
+ │
+ ├── NumberArranger
+ │
+ ├── BlockDetector
+ │
+ ├── WorkbookWriter
+ │
+ └── ProcessingStatistics
+ │
+ ▼
+Processed Workbook
 ```
 
 ---
 
-# 4. Class Responsibilities
+## Processing Order
+
+The processor coordinates the following sequence.
+
+1. Load workbook.
+2. Validate workbook structure.
+3. Build worksheet mappings.
+4. Verify workbook integrity.
+5. Create workbook backup.
+6. Start processing statistics.
+7. Detect eligible rows.
+8. Extract valid lottery numbers.
+9. Generate Number Wise Arrangement.
+10. Generate Last Digit Arrangement.
+11. Detect destination block state.
+12. Write arrangement blocks.
+13. Update processing statistics.
+14. Save processed workbook (planned).
+15. Return processing summary.
+
+---
+
+# 7. Data Flow
+
+The internal processing data changes format as it moves through the application.
+
+```text
+Excel Workbook
+
+        │
+
+WorkbookManager
+
+        │
+
+Workbook Row
+
+        │
+
+NumberExtractor
+
+        │
+
+LotteryNumber Objects
+
+        │
+
+NumberArranger
+
+        │
+
+Arrangement Dictionaries
+
+        │
+
+BlockDetector
+
+        │
+
+WorkbookWriter
+
+        │
+
+Updated Workbook
+```
+
+Each component transforms the data into a form required by the next component while maintaining clear separation of responsibilities.
+
+---
+
+# 8. Component Responsibilities
+
+Every component follows the Single Responsibility Principle.
+
+Each component owns one clearly defined responsibility and communicates only through the application layer.
+
+The following sections describe the responsibilities of each component.
 
 ## SweetDreamzProcessor
 
@@ -156,8 +323,16 @@ Responsibilities
 
 Responsibilities
 
-- Generate Middle Pair arrangement.
-- Generate Last Pair arrangement.
+- Generate Number Wise Arrangement.
+- Generate Last Digit Arrangement.
+- Group extracted lottery numbers.
+- Produce normalized arrangement dictionaries.
+
+Not Responsible For
+
+- Reading Excel workbooks.
+- Writing workbook data.
+- Block detection.
 
 ---
 
@@ -165,13 +340,16 @@ Responsibilities
 
 Responsibilities
 
-- Write values to worksheet cells.
+- Write arrangement blocks into workbook cells.
+- Preserve existing workbook formatting.
+- Perform only workbook writing operations.
 
 Not Responsible For
 
-- Skip decisions.
-- Block detection.
 - Business rules.
+- Arrangement generation.
+- Block detection.
+- Skip or rewrite decisions.
 
 ---
 
@@ -225,59 +403,227 @@ Responsibilities
 
 - Owns verification logic.
 
+---
+
+# 9. Design Principles
+
+SweetDreamzProcessor follows several architectural principles to ensure long-term maintainability and predictable behaviour.
 
 ---
 
-# 5. Dependency Diagram
+## Single Responsibility Principle (SRP)
+
+Every component owns exactly one responsibility.
+
+Examples:
+
+- WorkbookManager manages workbook operations.
+- NumberExtractor extracts lottery numbers.
+- NumberArranger generates arrangements.
+- WorkbookWriter writes workbook data.
+
+---
+
+## Separation of Concerns
+
+Business rules are completely separated from Excel operations.
+
+Business components never directly manipulate workbook cells.
+
+Infrastructure components never contain lottery business rules.
+
+---
+
+## Layered Architecture
+
+Each layer communicates only with the layer directly below it.
 
 ```text
 GUI
- │
- ▼
-SweetDreamzProcessor
- │
- ├── WorkbookManager
- ├── WorkbookVerifier
- ├── BackupManager
- ├── WorkbookMapper
- ├── WorkbookWriter
- ├── NumberExtractor
- ├── NumberArranger
- ├── RowDetector
- ├── BlockDetector
- └── ProcessingStatistics
+    ↓
+Application
+    ↓
+Business
+    ↓
+Infrastructure
+    ↓
+Workbook
 ```
 
-Dependencies should always flow downward.
+---
 
-Lower-level modules should never depend on higher-level modules.
+## Composition over Inheritance
+
+The application is built from small specialized components coordinated by SweetDreamzProcessor.
+
+Inheritance is avoided unless there is a clear architectural benefit.
 
 ---
 
-# 6. Design Principles
+## Fail-Fast Strategy
 
-The project follows:
+Critical validation occurs before workbook modification.
 
-- Single Responsibility Principle (SRP)
-- Composition over inheritance
-- Modular architecture
-- Incremental development
-- Test-driven validation
-- Separation of business logic from Excel operations
+Validation
+
+↓
+
+Verification
+
+↓
+
+Backup
+
+↓
+
+Processing
+
+If any critical step fails, processing stops immediately.
 
 ---
 
-# 7. Future Architecture
+## Workbook Safety First
 
-The following components are planned:
+Workbook integrity has higher priority than processing speed.
+
+The processor must never:
+
+- Overwrite completed blocks.
+- Modify an invalid workbook.
+- Process without a backup.
+
+---
+
+# 10. Design Patterns
+
+The application currently follows the following software design patterns.
+
+---
+
+## Facade Pattern
+
+SweetDreamzProcessor acts as the single public entry point for the application.
 
 ```text
+GUI
 
-GUI Progress Manager
+↓
 
-Report Generator
+SweetDreamzProcessor
 
-Executable Builder
+↓
+
+Processing Components
 ```
 
-These components will be integrated without changing the existing architecture.
+The GUI does not directly communicate with processing components.
+
+---
+
+## Coordinator Pattern
+
+SweetDreamzProcessor coordinates independent components without implementing their internal business logic.
+
+---
+
+## Strategy Pattern (Future)
+
+Future versions may support multiple arrangement algorithms while preserving the same processing workflow.
+
+---
+
+## Service Composition
+
+Application behaviour is achieved through composition of specialized services rather than large monolithic classes.
+
+---
+
+# 11. Dependency Rules
+
+Dependencies always flow downward.
+
+```text
+Presentation Layer
+        │
+        ▼
+Application Layer
+        │
+        ▼
+Business Layer
+        │
+        ▼
+Infrastructure Layer
+        │
+        ▼
+Workbook
+```
+
+The following dependencies are intentionally forbidden.
+
+- WorkbookWriter → GUI
+- NumberArranger → WorkbookManager
+- WorkbookManager → NumberExtractor
+- GUI → WorkbookWriter
+
+Every dependency should pass through SweetDreamzProcessor whenever coordination is required.
+
+---
+
+# 12. Future Architecture
+
+The current architecture has been designed to allow future expansion without major refactoring.
+
+Planned additions include:
+
+## User Interface
+
+- Process Workbook button
+- Progress bar
+- Live processing log
+- Processing summary dialog
+- Save As dialog
+
+---
+
+## Workbook Processing
+
+- Complete dual-arrangement processing
+- Workbook integrity verification
+- Workbook comparison
+
+---
+
+## Reporting
+
+- PDF processing report
+- CSV export
+- Processing history
+
+---
+
+## Distribution
+
+- PyInstaller executable
+- Windows installer
+- User Guide
+- Developer Guide
+
+The existing layered architecture is expected to remain unchanged throughout Version 1.x.
+
+---
+
+---
+
+# Architecture Summary
+
+SweetDreamzProcessor is designed around a layered modular architecture that separates user interaction, application coordination, business logic, and workbook infrastructure.
+
+The architecture emphasizes:
+
+- Maintainability
+- Readability
+- Testability
+- Workbook safety
+- Incremental development
+
+All future development should preserve these architectural principles.

@@ -1,213 +1,200 @@
 # SweetDreamzProcessor
+
 # Test Strategy
 
-**Version:** 0.3.0
+---
+
+## Document Information
+
+| Item | Value |
+|------|-------|
+| Project | SweetDreamzProcessor |
+| Document | Test Strategy |
+| Version | 0.4.0 |
+| Status | Active Development |
 
 ---
 
 # 1. Purpose
 
-This document describes the testing strategy used by the SweetDreamzProcessor project.
+This document defines the testing strategy for SweetDreamzProcessor.
 
-Testing ensures that every feature works correctly, regressions are detected early, and the application remains stable as new functionality is added.
-
----
-
-# 2. Testing Framework
-
-Framework
-
-- pytest
-
-Python Version
-
-- Python 3.14
+The objective is to ensure that every feature works correctly, existing functionality is not broken, and workbook integrity is maintained throughout development.
 
 ---
 
-# 3. Testing Philosophy
+# 2. Testing Philosophy
 
-The project follows an incremental development process.
+SweetDreamzProcessor follows an incremental testing approach.
 
-Every feature follows this workflow:
+Every feature must complete the following lifecycle before it is considered finished.
 
+```text
 Design
-
-↓
-
-Implement
-
-↓
-
-Unit Test
-
-↓
-
-Fix (if required)
-
-↓
-
-Regression Test
-
-↓
-
+    ↓
+Implementation
+    ↓
+Unit Testing
+    ↓
+Regression Testing
+    ↓
 Documentation Update
-
-↓
-
+    ↓
 Git Commit
+```
 
-↓
-
-Git Push
-
-No feature is complete until the entire regression suite passes.
+No feature is complete until all regression tests pass.
 
 ---
 
-# 4. Current Test Coverage
+# 3. Testing Levels
 
-## Workbook
+The project uses multiple levels of testing.
 
-- WorkbookManager
-- WorkbookValidator
-- WorkbookMapper
+## Unit Testing
 
----
+Verifies the behaviour of individual components in isolation.
 
-## Processing
+Current unit-tested components include:
 
 - NumberExtractor
 - NumberArranger
 - RowDetector
 - BlockDetector
 - WorkbookWriter
+- WorkbookMapper
+- WorkbookVerifier
+- BackupManager
+- ProcessingStatistics
 - SweetDreamzProcessor
 
 ---
 
-## Statistics
+## Integration Testing
 
-- ProcessingStatistics
+Verifies interaction between multiple components.
 
----
+Examples include:
 
-## Backup
-
-- BackupManager
-
----
-
-# 5. Current Status
-
-Current Tests
-
-- 20 passing tests
-
-Status
-
-- No known failures
-- No skipped tests
-- No expected failures (xfail)
-
----
-
-# 6. Regression Testing
-
-Run the complete test suite before every commit.
-
-Command
-
-```bash
-python -m pytest
-```
-
-Expected Output
-
-```text
-20 passed
-```
-
----
-
-# 7. Coding Rules
-
-Every new feature should include:
-
-- New tests when appropriate.
-- No existing tests should fail.
-- Existing behaviour must not change unless intentionally updated.
-
-Regression testing is mandatory.
-
----
-
-# 8. Future Testing
-
-Planned additions
-
-## Unit Tests
-
-- WorkbookVerifier
-- GUI Components
-- Save Workflow
-
----
-
-## Integration Tests
-
-- Complete workbook processing
-- Backup creation
-- Workbook saving
+- Workbook loading and validation
 - Workbook verification
+- Backup creation
+- Processing pipeline execution
+
+---
+
+## End-to-End Testing
+
+End-to-end testing verifies the complete processing workflow.
+
+The workflow includes:
+
+1. Load workbook
+2. Validate workbook
+3. Verify workbook
+4. Create backup
+5. Process eligible rows
+6. Generate both arrangements
+7. Write workbook
+8. Save processed workbook
+9. Return processing statistics
+
+---
+
+## Regression Testing
+
+Regression testing ensures that newly implemented features do not break previously working functionality.
+
+Regression testing is mandatory before every Git commit.
+
+---
+
+# 4. Current Test Coverage
+
+Current automated tests verify:
+
+- Lottery number extraction
+- Number arrangement
+- Row detection
+- Block detection
+- Workbook mapping
+- Workbook writing
+- Backup creation
+- Workbook verification
+- Processing statistics
+- Processing workflow
+
+Current Status:
+
+- 20 automated pytest tests
+- All tests passing
+
+---
+
+# 5. Future Test Coverage
+
+Additional tests planned include:
+
+## GUI Tests
+
+- Workbook selection
+- Process button
+- Progress bar
+- Save As dialog
+- Processing summary
+
+---
+
+## Workbook Integrity Tests
+
+- Formatting preservation
+- Merged cells
+- Conditional formatting
+- Workbook comparison
 
 ---
 
 ## End-to-End Tests
 
-Complete application workflow
-
-Workbook
-
-↓
-
-Processing
-
-↓
-
-Saving
-
-↓
-
-Verification
-
-↓
-
-GUI confirmation
+Complete workbook processing using sample workbooks.
 
 ---
 
-# 9. Quality Goals
+# 6. Quality Gates
 
-The project aims to achieve:
+Before a feature is considered complete:
 
-- Stable regression suite
-- High code reliability
-- Maintainable architecture
-- Predictable feature development
-- Easy debugging
-- Production-ready quality
+- Design reviewed
+- Implementation completed
+- Unit tests passing
+- Regression tests passing
+- Documentation updated
+- Git commit created
+
+No feature may bypass these quality gates.
 
 ---
 
-# 10. Continuous Improvement
+# 7. Test Execution
 
-After every completed feature:
+Run the complete regression suite using:
 
-- Add or update tests.
-- Run the full regression suite.
-- Update the changelog.
-- Update the roadmap.
-- Update the architecture document if required.
+```bash
+python -m pytest
+```
 
-This ensures that documentation and implementation remain synchronized throughout the project's lifecycle.
+Every test must pass before code is merged into the main development branch.
+
+---
+
+# 8. Long-Term Goal
+
+The long-term objective is to achieve comprehensive automated testing covering:
+
+- Business logic
+- Workbook operations
+- GUI workflow
+- End-to-end processing
+- Regression protection
+
+The test suite should provide confidence that future development can continue without introducing regressions.
