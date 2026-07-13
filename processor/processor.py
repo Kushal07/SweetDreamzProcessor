@@ -91,7 +91,16 @@ class SweetDreamzProcessor:
         worksheet_name: str,
     ) -> None:
         """
-        Complete missing arrangement headers.
+        Ensure that the worksheet contains a complete
+        00–99 arrangement header structure.
+
+        For each missing pair:
+
+        - Reuse an existing reserved header block when available.
+        - Otherwise insert a new three-column header block.
+        - Refresh the cached worksheet mapping after each change.
+
+        Existing source data and workbook content are preserved.
 
         Implementation will be added in the next step.
         """
@@ -192,13 +201,6 @@ class SweetDreamzProcessor:
             mapping = self.sheet_mappings[
                 worksheet_name
             ]
-        #
-        # ARR-004 implementation continues
-        # in the next milestone.
-        #
-        # For now we only detect and report
-        # missing headers.
-        #
 
     def process_row(
         self,

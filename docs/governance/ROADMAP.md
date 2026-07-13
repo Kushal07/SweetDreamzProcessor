@@ -90,7 +90,7 @@ Tasks
 Automatic Workbook Completion
 
 Status:
-In Progress
+Complete
 
 Tasks
 
@@ -239,7 +239,7 @@ Testing
 █████████████████░░░ 85%
 
 Automatic Workbook Completion
-████░░░░░░░░░░░░░░░░ 20%
+████████████████████ 100%
 
 Version 1.0 Overall
 ████████████████░░░░ 82%
