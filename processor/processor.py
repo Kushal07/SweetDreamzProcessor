@@ -12,6 +12,7 @@ from processor.backup_manager import BackupManager
 from processor.writer import WorkbookWriter
 
 from processor.row_detector import RowDetector
+from processor.block_creator import BlockCreator
 from processor.block_detector import (
     BlockDetector,
     BlockState,
@@ -19,6 +20,7 @@ from processor.block_detector import (
 
 from utils.logger import get_logger
 from processor.processing_statistics import ProcessingStatistics
+
 
 class SweetDreamzProcessor:
 
@@ -32,7 +34,7 @@ class SweetDreamzProcessor:
         self.writer = WorkbookWriter()
 
         self.backup_manager = BackupManager()
-
+        self.block_creator = BlockCreator()
         self.block_detector = BlockDetector()
         self.statistics = ProcessingStatistics()
         self.logger = get_logger(__name__)
@@ -63,6 +65,140 @@ class SweetDreamzProcessor:
 
             self.sheet_mappings[sheet_name] = mapping
             
+    def _refresh_sheet_mapping(
+        self,
+        sheet_name: str,
+    ) -> None:
+        """
+        Refresh the cached mapping for a single worksheet.
+        """
+
+        worksheet = self.workbook.get_sheet(sheet_name)
+
+        if sheet_name.lower() == "last digit arrangement":
+            mapping = self.mapper.map_last_digit_columns(
+                worksheet
+            )
+        else:
+            mapping = self.mapper.map_pair_columns(
+                worksheet
+            )
+
+        self.sheet_mappings[sheet_name] = mapping
+
+    def _complete_missing_headers(
+        self,
+        worksheet_name: str,
+    ) -> None:
+        """
+        Complete missing arrangement headers.
+
+        Implementation will be added in the next step.
+        """
+
+        worksheet = self.workbook.get_sheet(
+            worksheet_name,
+        )
+
+        mapping = self.sheet_mappings.get(
+            worksheet_name,
+        )
+
+        if mapping is None:
+            raise RuntimeError(
+                f"No cached mapping for worksheet '{worksheet_name}'."
+            )
+
+        missing_pairs = self.mapper.get_missing_pairs(
+            mapping,
+        )
+
+        if not missing_pairs:
+            return
+
+        self.logger.info(
+            "%s: %d missing arrangement header(s) detected.",
+            worksheet_name,
+            len(missing_pairs),
+        )
+
+        is_last_digit = (
+            worksheet_name.lower() == "last digit arrangement"
+        )
+
+        for pair in missing_pairs:
+
+            reserved_column = self.mapper.find_reserved_space(
+                worksheet=worksheet,
+                pair=pair,
+                is_last_digit=is_last_digit,
+            )
+
+            if reserved_column is not None:
+
+                if is_last_digit:
+
+                    self.block_creator.fill_last_header(
+                        worksheet=worksheet,
+                        start_column=reserved_column,
+                        pair=pair,
+                    )
+
+                else:
+
+                    self.block_creator.fill_middle_header(
+                        worksheet=worksheet,
+                        start_column=reserved_column,
+                        pair=pair,
+                    )
+
+                self.logger.info(
+                    "Pair %s: reserved header completed.",
+                    pair,
+                )
+
+            else:
+
+                insert_column = self.mapper.find_insert_position(
+                    mapping,
+                    pair,
+                )
+
+                if is_last_digit:
+
+                    self.block_creator.insert_last_block(
+                        worksheet=worksheet,
+                        start_column=insert_column,
+                        pair=pair,
+                    )
+
+                else:
+
+                    self.block_creator.insert_middle_block(
+                        worksheet=worksheet,
+                        start_column=insert_column,
+                        pair=pair,
+                    )
+
+                self.logger.info(
+                    "Pair %s: new arrangement block inserted.",
+                    pair,
+                )
+
+            self._refresh_sheet_mapping(
+                worksheet_name,
+            )
+
+            mapping = self.sheet_mappings[
+                worksheet_name
+            ]
+        #
+        # ARR-004 implementation continues
+        # in the next milestone.
+        #
+        # For now we only detect and report
+        # missing headers.
+        #
 
     def process_row(
         self,
@@ -108,6 +244,8 @@ class SweetDreamzProcessor:
             raise RuntimeError(
                 f"No cached mapping for worksheet '{worksheet_name}'."
             )
+
+
 
         if pair not in mapping:
             raise KeyError(
@@ -170,6 +308,7 @@ class SweetDreamzProcessor:
             raise RuntimeError(
                 f"No cached mapping for worksheet '{worksheet_name}'."
             )
+
 
         if pair not in mapping:
             raise KeyError(
@@ -270,8 +409,7 @@ class SweetDreamzProcessor:
             row,
         )
         self.statistics.rows_processed += 1
-        self.logger.info(f"Processed row {row}")
-
+       
         self.write_middle_arrangement(
             worksheet_name=number_wise_sheet,
             row=row,
@@ -302,6 +440,14 @@ class SweetDreamzProcessor:
             destination_sheet=number_wise_sheet,
         )
 
+        self._complete_missing_headers(
+            number_wise_sheet,
+        )
+
+        self._complete_missing_headers(
+            last_digit_sheet,
+        )
+
         if self.workbook.file_path is None:
             raise RuntimeError("Workbook path is not available.")
 
@@ -321,7 +467,7 @@ class SweetDreamzProcessor:
         try:
             for row_number in range(2, worksheet.max_row + 1):
 
-                self.logger.info(f"Checking row {row_number}")
+                
 
                 row = self.workbook.get_row_data(
                     source_sheet,
@@ -333,7 +479,7 @@ class SweetDreamzProcessor:
                     row["first_prize"],
                     row["second_prize"],
                 ):
-                    self.logger.info(f"Skipping row {row_number}")
+                 
                     continue
 
                 self.process_and_write_row(

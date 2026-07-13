@@ -321,6 +321,17 @@ The worksheet layouts are intentionally different because each worksheet is orga
 
 ---
 
+### Worksheet Preservation Rule
+
+State that:
+
+- Columns Date, 1st Prize, and 2nd Prize are permanent.
+- Their headers, positions, formatting, and data must never be modified.
+- Arrangement headers are created only after these columns.
+- Existing arrangement data must never be overwritten.
+
+---
+
 # 9. Arrangement Block Structure
 
 The Arrangement Block is the fundamental business object used by SweetDreamzProcessor.
@@ -952,8 +963,15 @@ If the required destination heading does not exist:
 
 The processor shall:
 
-1. Determine the correct numerical position.
-2. Insert a new Arrangement Block.
+1. Detect missing arrangement headers.
+
+1(1)  Create only the missing arrangement header blocks.
+
+2. Never insert worksheet columns that shift existing data.
+
+2(2) Never overwrite existing data.
+
+Preserve worksheet structure.
 3. Create the worksheet heading.
 4. Preserve worksheet formatting.
 5. Preserve merged cells.
@@ -1068,6 +1086,28 @@ The processor shall preserve:
 ## WB-005 — Completed Data Protection
 
 Previously completed Arrangement Blocks shall never be overwritten.
+
+---
+
+## WB-006
+
+Source Data Protection
+
+- The processor shall never modify:
+
+- | Date | 1st Prize | 2nd Prize | headers or their associated data.
+
+---
+
+## WB-007
+
+Worksheet Structure Protection
+
+The processor shall never:
+
+- insert worksheet columns before existing data
+- delete worksheet columns
+- shift worksheet data
 
 ---
 
@@ -1251,7 +1291,8 @@ All future Software Design Specifications, Software Architecture documents, Test
 | ARR-001  | Number Wise Placement          | Implemented |
 | ARR-002  | Last Digit Placement           | Implemented |
 | ARR-003  | Duplicate Handling             | Implemented |
-| ARR-004  | Automatic Heading Creation     | Planned     |
+| ARR-004  | Non-Destructive Arrangement    | Planned     |
+                Header Completion     
 | BLK-001  | EMPTY Block                    | Implemented |
 | BLK-002  | COMPLETE Block                 | Implemented |
 | BLK-003  | PARTIAL Block                  | Implemented |

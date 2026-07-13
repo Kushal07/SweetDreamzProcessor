@@ -29,3 +29,19 @@ Desktop.ini
 
 # backup files
 backup/
+
+
+.gitignore
+gui.py
+processor/processor.py
+processor/workbook_mapper.py
+processor/writer.py
+tests/test_workbook_processor.py
+
+docs/Business_Specification.md
+docs/Software_Design_Specification.md
+docs/TestStrategy.md
+
+docs/governance/CHANGELOG.md
+docs/governance/Developer_Guide.md
+docs/governance/ROADMAP.md

@@ -33,3 +33,12 @@ def test_process_and_write_row():
             break
 
     assert wrote_data
+
+def test_missing_middle_header_is_created():
+    """
+    ARR-004
+
+    Verify that a missing Number Wise arrangement
+    header can be recreated without modifying the
+    source worksheet columns.
+    """

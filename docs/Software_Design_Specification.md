@@ -119,6 +119,14 @@ The software reads eligible lottery draws, generates two independent arrangement
 
 The application shall implement all approved business rules defined by the Business Specification.
 
+Design Constraint – Workbook Preservation
+
+The software shall never modify the original worksheet structure except for completing missing arrangement headers required by the approved Business Specification.
+
+The Date, 1st Prize and 2nd Prize columns, together with all existing worksheet data, shall remain unchanged throughout processing.
+
+The processor shall never insert, delete, move or overwrite worksheet columns that contain existing data.
+
 ---
 
 ---
@@ -369,7 +377,7 @@ Implemented
 
 ---
 
-## FR-009 — Create Missing Arrangement Heading
+## FR-009 — Complete Missing Arrangement Headers
 
 ### Derived From
 
@@ -377,15 +385,21 @@ ARR-004
 
 ### Description
 
-If the destination Arrangement Block does not exist, the system shall create it automatically.
+If the arrangement header section is incomplete, the system shall complete only the missing arrangement header blocks.
+
+The system shall preserve all existing worksheet data, workbook structure, and formatting.
 
 The new block shall preserve worksheet formatting and update worksheet mappings.
 
 ### Acceptance Criteria
 
-- Missing headings are created automatically.
-- Workbook formatting is preserved.
-- Processing continues normally.
+• Missing arrangement headers are created automatically.
+• Existing arrangement headers are preserved.
+• Existing arrangement data is preserved.
+• Date, 1st Prize and 2nd Prize columns remain unchanged.
+• Existing worksheet data is never moved or overwritten.
+• Workbook formatting is preserved.
+• Processing continues normally after completing the headers.
 
 ### Priority
 
@@ -511,6 +525,8 @@ The system shall protect the workbook from unintended modification.
 - Workbook validation is completed before processing.
 - Workbook verification is completed before modification.
 - A backup is created before any workbook is changed.
+- Date, 1st Prize and 2nd Prize columns shall never be modified.
+- Existing worksheet data shall never be shifted or overwritten.
 
 ### Priority
 
@@ -540,6 +556,10 @@ The processor shall preserve:
 - Column widths
 - Merged cells
 - Existing formulas (where applicable)
+- Existing worksheet layout
+- Existing arrangement headers
+- Existing arrangement data
+- Source worksheet columns
 
 ### Priority
 
@@ -649,6 +669,7 @@ The software shall continue processing whenever possible without corrupting the 
 - Invalid lottery numbers are ignored.
 - Partial Arrangement Blocks are rewritten.
 - Processing statistics accurately record warnings and skipped blocks.
+- Missing arrangement headers are completed without altering existing worksheet data.
 
 ### Priority
 
@@ -1236,11 +1257,13 @@ The system shall manage Arrangement Blocks.
 
 ### Responsibilities
 
-- Locate destination block
-- Detect block state
-- Create missing heading (future)
-- Protect completed blocks
-- Rewrite partial blocks
+• Detect missing arrangement headers
+• Complete missing arrangement headers
+• Preserve existing arrangement headers
+• Preserve existing arrangement data
+• Detect block state
+• Protect completed blocks
+• Rewrite partial blocks
 
 ### Related Requirements
 
@@ -1260,10 +1283,13 @@ The system shall safely write generated Arrangement Blocks into the workbook.
 
 ### Responsibilities
 
-- Preserve workbook formatting
-- Preserve workbook structure
-- Preserve completed data
-- Write generated blocks
+• Preserve workbook formatting
+• Preserve workbook structure
+• Preserve source worksheet columns
+• Preserve existing arrangement headers
+• Preserve existing arrangement data
+• Write generated arrangement blocks
+• Never overwrite unrelated worksheet data
 
 ### Related Requirements
 
@@ -1699,10 +1725,14 @@ Current Behaviour
 - Stop processing.
 - Inform the user.
 
-Future Behaviour (Milestone 2)
+System Response
 
-- Create the missing Arrangement Block automatically.
-- Continue processing.
+• Detect the incomplete arrangement header section.
+• Create only the missing arrangement headers.
+• Preserve all existing worksheet data.
+• Preserve workbook formatting.
+• Refresh worksheet mappings.
+• Continue processing automatically.
 
 ### Severity
 
@@ -1858,6 +1888,7 @@ The system shall record arrangement generation events.
 - Arrangement Blocks written
 - Arrangement Blocks skipped
 - Arrangement Blocks rewritten
+- Missing arrangement headers completed
 
 ### Priority
 
@@ -2113,7 +2144,7 @@ The following approved features are planned for future milestones.
 
 | ID | Feature | Status |
 |----|---------|--------|
-| FUT-001 | Automatic Arrangement Block creation | Planned |
+| FUT-001 | Automatic Non-Destructive Arrangement Header Completion | Planned |
 | FUT-002 | Enhanced Save As workflow | Planned |
 | FUT-003 | Improved processing summary dialog | Planned |
 | FUT-004 | Advanced logging export | Future |

@@ -94,11 +94,14 @@ In Progress
 
 Tasks
 
-[ ] Automatic Arrangement Block creation
-[ ] Automatic heading creation
-[ ] Automatic formatting copy
-[ ] Automatic mapping refresh
+[x] Automatic heading completion
+[x] Automatic mapping refresh
+[x] Missing pair detection
+
+[ ] Reserved header reuse
 [ ] Automatic missing pair insertion
+[ ] Automatic formatting copy
+[ ] Manual workbook validation
 
 Priority:
 High
@@ -106,6 +109,25 @@ High
 ---
 
 # Milestone 6
+Workbook Integrity Validation
+
+Status:
+Pending
+
+Tasks
+
+[ ] Validate complete 00–99 structure
+[ ] Detect duplicate arrangement headers
+[ ] Validate header order
+[ ] Verify source columns remain unchanged
+[ ] Validate workbook before save
+
+Priority:
+High
+
+---
+
+# Milestone 7
 User Experience
 
 Status:
@@ -127,7 +149,7 @@ Medium
 
 ---
 
-# Milestone 7
+# Milestone 8
 Reporting
 
 Status:
@@ -145,7 +167,7 @@ Medium
 
 ---
 
-# Milestone 8
+# Milestone 9
 Testing
 
 Status:
@@ -154,11 +176,12 @@ In Progress
 Tasks
 
 [x] Unit tests
+[x] Component tests
 [x] Regression tests
 
 Remaining
 
-[ ] Integration tests
+[ ] Manual workbook validation
 [ ] GUI tests
 [ ] Performance tests
 [ ] Large workbook stress tests
@@ -169,7 +192,7 @@ High
 
 ---
 
-# Milestone 9
+# Milestone 10
 Version 1.0 Release
 
 Status:
@@ -182,6 +205,11 @@ Release Checklist
 [ ] Architecture review
 [ ] Regression tests passing
 [ ] Manual workbook verification
+[ ] ARR-004 complete
+[ ] Manual workbook validation passed
+[ ] All automated tests passing
+[ ] No workbook data loss
+[ ] Source columns preserved
 [ ] Documentation finalized
 [ ] Version tagging
 [ ] Release package
@@ -208,7 +236,7 @@ GUI
 ████████████████████ 100%
 
 Testing
-███████████████░░░░░ 75%
+█████████████████░░░ 85%
 
 Automatic Workbook Completion
 ████░░░░░░░░░░░░░░░░ 20%
