@@ -1,0 +1,1 @@
+## Future\n- AI Prediction integration\n- Web portal deployment.

@@ -1,0 +1,1 @@
+## Dev Guide\nPython 3.10+, openpyxl 3.1.2. Built for Kushal Bera.

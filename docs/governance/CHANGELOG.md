@@ -1,0 +1,1 @@
+## v10.0\n- Redesigned Success Dialog\n- Full Technical Documentation Suite\n- Perfect Row Reflow logic.
